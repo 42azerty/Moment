@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <paths>
+        <external-path name="my_images" path="Android/data/com.example.moments/files/Pictures" />
+    </paths>
+</androidx.preference.PreferenceScreen>
