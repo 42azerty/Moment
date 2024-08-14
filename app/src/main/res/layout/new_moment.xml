@@ -30,13 +30,17 @@
             android:hint="@string/title"
             android:importantForAutofill="no" />
 
-        <EditText
+        <MultiAutoCompleteTextView
             android:id="@+id/editContents"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="20dp"
             android:hint="@string/contents"
-            android:inputType="text"
+            android:inputType="textMultiLine"
+            android:gravity="top|start"
+            android:minLines="4"
+            android:maxLines="10"
+            android:scrollbars="vertical"
             android:importantForAutofill="no" />
 
         <TableRow

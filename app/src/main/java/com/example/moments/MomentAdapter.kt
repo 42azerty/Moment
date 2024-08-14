@@ -1,7 +1,6 @@
 package com.example.moments
 
 import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,17 +41,14 @@ class MomentAdapter(private val mainActivity: MainActivity) :
         holder.title.text = moment.title
         holder.contents.text = if (moment.contents.length < 15) moment.contents
         else moment.contents.substring(0, 15) + "..."
-        Log.d("MomentAdapter", "Binding moment at position $position with address: ${moment.address}")
         val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
         holder.date.text = dateFormat.format(moment.date)
         holder.date.visibility = View.VISIBLE
         moment.address?.let { address ->
             holder.address.text = address
             holder.address.visibility = View.VISIBLE
-            Log.d("MomentAdapter", "Address set and visible")
         } ?: run {
             holder.address.visibility = View.GONE
-            Log.d("MomentAdapter", "Address not available, view hidden")
         }
         moment.photoPath?.let { uriString ->
             if (uriString.isNotEmpty()) {

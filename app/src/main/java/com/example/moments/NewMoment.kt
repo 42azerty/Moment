@@ -16,7 +16,6 @@ import android.os.Bundle
 import android.os.Environment
 import android.os.Looper
 import android.provider.MediaStore
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -58,7 +57,6 @@ class NewMoment : DialogFragment() {
         val inflater = mainActivity.layoutInflater
         _binding = NewMomentBinding.inflate(inflater)
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(mainActivity)
-        Log.d("NewMoment", "Dialog created")
         val builder = AlertDialog.Builder(mainActivity)
             .setView(binding.root)
             .setMessage(resources.getString(R.string.add_new_moment))
@@ -88,7 +86,6 @@ class NewMoment : DialogFragment() {
         }
 
         binding.btnTakePhoto.setOnClickListener {
-            Log.d("NewMoment", "Take Photo button clicked")
             dispatchTakePictureIntent()
         }
         binding.btnOK.setOnClickListener {
@@ -115,7 +112,6 @@ class NewMoment : DialogFragment() {
         return builder.create()
     }
     private fun getLastLocation() {
-        Log.d("NewMoment", "Getting last location")
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -124,7 +120,6 @@ class NewMoment : DialogFragment() {
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            Log.d("NewMoment", "Location permissions not granted")
             ActivityCompat.requestPermissions(
                 requireActivity(),
                 arrayOf(
@@ -138,15 +133,10 @@ class NewMoment : DialogFragment() {
         fusedLocationClient.lastLocation
             .addOnSuccessListener { location: Location? ->
                 if (location != null) {
-                    Log.d("NewMoment", "Location obtained: ${location.latitude}, ${location.longitude}")
                     getAddressFromLocation(location)
                 } else {
-                    Log.d("NewMoment", "Location is null, trying to request new location")
                     requestNewLocation()
                 }
-            }
-            .addOnFailureListener { e ->
-                Log.e("NewMoment", "Error getting location", e)
             }
     }
 
@@ -171,26 +161,20 @@ class NewMoment : DialogFragment() {
         fusedLocationClient.requestLocationUpdates(locationRequest, object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult) {
                 locationResult.lastLocation?.let { location ->
-                    Log.d("NewMoment", "New location obtained: ${location.latitude}, ${location.longitude}")
                     getAddressFromLocation(location)
                 }
             }
         }, Looper.getMainLooper())
     }
     private fun getAddressFromLocation(location: Location) {
-        Log.d("NewMoment", "Getting address from location")
         val geocoder = Geocoder(requireContext(), Locale.getDefault())
         try {
             val addresses = geocoder.getFromLocation(location.latitude, location.longitude, 1)
             if (addresses != null && addresses.isNotEmpty()) {
                 val address = addresses[0]
                 currentAddress = address.getAddressLine(0)
-                Log.d("NewMoment", "Address obtained: $currentAddress")
-            } else {
-                Log.d("NewMoment", "No addresses found")
             }
         } catch (e: Exception) {
-            Log.e("NewMoment", "Error getting address", e)
         }
     }
 
@@ -209,7 +193,6 @@ class NewMoment : DialogFragment() {
                 try {
                     startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE)
                 } catch (e: ActivityNotFoundException) {
-                    Log.e("NewMoment", "No camera activity found", e)
                     Toast.makeText(requireContext(), "No camera app found", Toast.LENGTH_SHORT).show()
                 }
             }
@@ -224,27 +207,21 @@ class NewMoment : DialogFragment() {
                 "JPEG_${timeStamp}_",
                 ".jpg",
                 storageDir
-            ).apply {
-                Log.d("NewMoment", "Photo file created at: ${this.absolutePath}")
-            }
+            )
         } catch (ex: IOException) {
-            Log.e("NewMoment", "Error creating image file", ex)
             null
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Log.d("NewMoment", "onActivityResult called. RequestCode: $requestCode, ResultCode: $resultCode")
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
-            Log.d("NewMoment", "Photo captured successfully")
             lifecycleScope.launch {
                 saveImageToGallery()
                 binding.imagePreview.setImageURI(photoUri)
                 binding.imagePreview.visibility = View.VISIBLE
             }
         } else {
-            Log.d("NewMoment", "Photo capture failed or was cancelled")
         }
     }
 
@@ -264,11 +241,9 @@ class NewMoment : DialogFragment() {
                 uri?.let {
                     contentResolver.openOutputStream(it)?.use { outputStream ->
                         bitmap.compress(Bitmap.CompressFormat.JPEG, 90, outputStream)
-                        Log.d("NewMoment", "Photo saved to gallery: $it")
                     }
                 }
             } catch (ex: Exception) {
-                Log.e("NewMoment", "Error saving image to gallery", ex)
             }
         }
     }

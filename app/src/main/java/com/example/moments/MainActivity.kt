@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -107,7 +106,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun createNewMoment(moment: Moment) {
-        Log.d("MainActivity", "Saving moment with address: ${moment.address}")
         adapter.momentList.add(moment)
         adapter.notifyItemInserted(adapter.momentList.size - 1)
         saveMoment()
@@ -129,7 +127,6 @@ class MainActivity : AppCompatActivity() {
         val gson = GsonBuilder().create()
         val jsonMoments = gson.toJson(moments)
 
-        Log.d("MainActivity", "Saving moments: $jsonMoments")
 
         val outputStream = openFileOutput(FILEPATH, Context.MODE_PRIVATE)
         OutputStreamWriter(outputStream).use { writer ->
@@ -148,7 +145,6 @@ class MainActivity : AppCompatActivity() {
                 if (stringBuilder.isNotEmpty()){
                     val listType = object : TypeToken<List<Moment>>() {}.type
                     momentList.addAll(Gson().fromJson(stringBuilder.toString(), listType))
-                    Log.d("MainActivity", "Retrieved moments: ${stringBuilder.toString()}")
                 }
             }
         }

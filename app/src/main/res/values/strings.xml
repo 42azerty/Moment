@@ -14,7 +14,7 @@
     <string name="add_new_moment">Add a new moments…</string>
     <string name="moment_empty">Check the title and contents fields are not empty.</string>
     <string name="moment_title_to_long">the title is to long (max 25 character)</string>
-    <string name="moment_content_to_long">Le contenu est trop long (max 25 character)</string>
+    <string name="moment_content_to_long">Le contenu est trop long (max 400 character)</string>
     <string name="moment_saved">Moment saved!</string>
     <string name="moment_deleted">Moment deleted!</string>
     <string name="title_activity_settings">SettingsActivity</string>
