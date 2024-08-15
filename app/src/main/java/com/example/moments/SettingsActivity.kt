@@ -55,6 +55,12 @@ class SettingsActivity : AppCompatActivity() {
                         if (nightThemeSelected) AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                         else AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                     }
+                    "sort_order" -> {
+                        // Informer MainActivity que l'ordre de tri a changé
+                        (activity as? MainActivity)?.sortMoments()
+                    }
+
+                    else -> {}
                 }
             }
         }

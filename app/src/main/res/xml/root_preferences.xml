@@ -9,4 +9,12 @@
         app:key="dividingLines"
         app:defaultValue="false"
         app:title="@string/add_dividers" />
+
+
+    <ListPreference
+        app:key="sort_order"
+        app:title="Trier les moments par"
+        app:defaultValue="date"
+        app:entries="@array/sort_options"
+        app:entryValues="@array/sort_values" />
 </PreferenceScreen>

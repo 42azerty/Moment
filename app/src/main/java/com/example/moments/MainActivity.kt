@@ -12,6 +12,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.SearchView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.preference.PreferenceManager
@@ -33,7 +34,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var sharedPreferences: SharedPreferences
     private val CAMERA_PERMISSION_CODE = 100
     private val CAMERA_REQUEST_CODE = 101
-
+    private lateinit var searchView: SearchView
+    private var originalList: List<Moment> = listOf()
     companion object {
         private const val FILEPATH = "moments.json"
     }
@@ -64,6 +66,8 @@ class MainActivity : AppCompatActivity() {
                 arrayOf(Manifest.permission.CAMERA),
                 CAMERA_PERMISSION_CODE)
         }
+        originalList = adapter.momentList.toList()
+
     }
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
@@ -75,7 +79,36 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
 
+        val searchItem = menu.findItem(R.id.action_search)
+        searchView = searchItem.actionView as SearchView
+
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                filterMoments(newText)
+                return true
+            }
+        })
+
+        return true
+    }
+
+    private fun filterMoments(query: String?) {
+        if (query.isNullOrBlank()) {
+            adapter.momentList = originalList.toMutableList()
+        } else {
+            adapter.momentList = originalList.filter {
+                it.title.contains(query, ignoreCase = true)
+            }.toMutableList()
+        }
+        adapter.notifyDataSetChanged()
+    }
     override fun onStart() {
         super.onStart()
 
@@ -88,11 +121,7 @@ class MainActivity : AppCompatActivity() {
         else if (binding.recyclerView.itemDecorationCount > 0) binding.recyclerView.removeItemDecorationAt(0)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
@@ -108,6 +137,7 @@ class MainActivity : AppCompatActivity() {
     fun createNewMoment(moment: Moment) {
         adapter.momentList.add(moment)
         adapter.notifyItemInserted(adapter.momentList.size - 1)
+        sortMoments()
         saveMoment()
     }
 
@@ -133,7 +163,24 @@ class MainActivity : AppCompatActivity() {
             writer.write(jsonMoments)
         }
     }
+    internal fun sortMoments() {
+        val sortOrder = PreferenceManager.getDefaultSharedPreferences(this)
+            .getString("sort_order", "date") ?: "date"
 
+        adapter.momentList = when (sortOrder) {
+            "date" -> adapter.momentList.sortedByDescending { it.date }
+            "title" -> adapter.momentList.sortedBy { it.title.uppercase() }
+            "location" -> adapter.momentList.sortedBy { it.address ?: "" }
+            else -> adapter.momentList
+        }.toMutableList()
+
+        adapter.notifyDataSetChanged()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        sortMoments()
+    }
     private fun retrieveMoments(): MutableList<Moment> {
         val momentList = mutableListOf<Moment>()
         if (getFileStreamPath(FILEPATH).isFile) {
@@ -148,6 +195,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        return momentList
+        return momentList.toMutableList().also { sortMoments() }
     }
 }

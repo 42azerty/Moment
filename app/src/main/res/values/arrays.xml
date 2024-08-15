@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="sort_options">
+        <item>Date</item>
+        <item>Titre</item>
+        <item>Emplacement</item>
+    </string-array>
+
+    <string-array name="sort_values">
+        <item>date</item>
+        <item>title</item>
+        <item>location</item>
+    </string-array>
+</resources>
